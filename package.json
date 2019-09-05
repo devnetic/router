@@ -1,0 +1,30 @@
+{
+  "name": "@devnetic/router",
+  "version": "1.0.0",
+  "description": "Handle routes with option to have placeholders",
+  "main": "index.js",
+  "scripts": {
+    "test": "ava",
+    "test:watch": "ava --watch",
+    "lint": "standard"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devnetic/router.git"
+  },
+  "keywords": [
+    "router",
+    "routes",
+    "server"
+  ],
+  "author": "Álvaro José Agámez Licha",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/devnetic/router/issues"
+  },
+  "homepage": "https://github.com/devnetic/router#readme",
+  "devDependencies": {
+    "ava": "^2.3.0",
+    "standard": "^14.1.0"
+  }
+}
