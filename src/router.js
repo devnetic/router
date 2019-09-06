@@ -1,5 +1,30 @@
 const { URL } = require('url')
 
+const methods = [
+  'checkout',
+  'copy',
+  'delete',
+  'get',
+  'head',
+  'lock',
+  'merge',
+  'mkactivity',
+  'mkcol',
+  'move',
+  'm-search',
+  'notify',
+  'options',
+  'patch',
+  'post',
+  'purge',
+  'put',
+  'report',
+  'search',
+  'subscribe',
+  'trace',
+  'unlock',
+  'unsubscribe'
+]
 /**
  * A route in the Router module
  *
@@ -37,6 +62,8 @@ const addRoute = (method, path, handler) => {
   }
 
   routes[method].push(route)
+
+  return proxy
 }
 
 /**
@@ -48,57 +75,67 @@ const getRoutes = () => {
   return routes
 }
 
-const routerMethods = {
-  /**
-   * Add a DELETE route handler to the router module
-   *
-   * @param {string} path
-   * @param {function} handler
-   * @returns {void}
-   */
-  delete: (path, handler) => {
-    addRoute('DELETE', path, handler)
-  },
-  /**
-   * Add a GET route handler to the router module
-   *
-   * @param {string} path
-   * @param {function} handler
-   * @returns {void}
-   */
-  get: (path, handler) => {
-    addRoute('GET', path, handler)
-  },
-  /**
-   * Add a PATH route handler to the router module
-   *
-   * @param {string} path
-   * @param {function} handler
-   * @returns {void}
-   */
-  patch: (path, handler) => {
-    addRoute('PATCH', path, handler)
-  },
-  /**
-   * Add a POST route handler to the router module
-   *
-   * @param {string} path
-   * @param {function} handler
-   * @returns {void}
-   */
-  post: (path, handler) => {
-    addRoute('POST', path, handler)
-  },
-  /**
-   * Add a PUT route handler to the router module
-   * @param {string} path
-   * @param {function} handler
-   * @returns {void}
-   */
-  put: (path, handler) => {
-    addRoute('PUT', path, handler)
-  }
-}
+// const routerMethods = {
+//   /**
+//    * Add a DELETE route handler to the router module
+//    *
+//    * @param {string} path
+//    * @param {function} handler
+//    * @returns {void}
+//    */
+//   delete: (path, handler) => {
+//     addRoute('DELETE', path, handler)
+//   },
+//   /**
+//    * Add a GET route handler to the router module
+//    *
+//    * @param {string} path
+//    * @param {function} handler
+//    * @returns {void}
+//    */
+//   get: (path, handler) => {
+//     addRoute('GET', path, handler)
+//   },
+//   /**
+//    * Add a OPTIONS route handler to the router module
+//    *
+//    * @param {string} path
+//    * @param {function} handler
+//    * @returns {void}
+//    */
+//   options: (path, handler) => {
+//     addRoute('OPTIONS', path, handler)
+//   },
+//   /**
+//    * Add a PATH route handler to the router module
+//    *
+//    * @param {string} path
+//    * @param {function} handler
+//    * @returns {void}
+//    */
+//   patch: (path, handler) => {
+//     addRoute('PATCH', path, handler)
+//   },
+//   /**
+//    * Add a POST route handler to the router module
+//    *
+//    * @param {string} path
+//    * @param {function} handler
+//    * @returns {void}
+//    */
+//   post: (path, handler) => {
+//     addRoute('POST', path, handler)
+//   },
+//   /**
+//    * Add a PUT route handler to the router module
+//    * @param {string} path
+//    * @param {function} handler
+//    * @returns {void}
+//    */
+//   put: (path, handler) => {
+//     addRoute('PUT', path, handler)
+//   }
+// }
 
 /**
  * Set the routes to a complete new ones
@@ -108,6 +145,8 @@ const routerMethods = {
  */
 const setRoutes = (newRoutes) => {
   routes = newRoutes
+
+  return proxy
 }
 
 /**
@@ -146,10 +185,32 @@ const verifyRoute = (path, method) => {
   }, [])
 }
 
-module.exports = {
+const router = {
   addRoute,
   getRoutes,
-  ...routerMethods,
   setRoutes,
   verifyRoute
 }
+
+const proxy = new Proxy(router, {
+  get (target, property) {
+    if (Reflect.has(target, property)) {
+      return Reflect.get(target, property)
+    } else if (methods.includes(property)) {
+      return (path, handler) => {
+        return addRoute(property.toUpperCase(), path, handler)
+      }
+    }
+  }
+})
+
+module.exports = proxy
+
+// module.exports = {
+//   addRoute,
+//   addRouterMethod,
+//   getRoutes,
+//   ...routerMethods,
+//   setRoutes,
+//   verifyRoute
+// }

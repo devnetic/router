@@ -1,7 +1,7 @@
 {
   "name": "@devnetic/router",
   "version": "1.0.0",
-  "description": "Handle routes with option to have placeholders",
+  "description": "Simple router to match URLs.",
   "main": "index.js",
   "scripts": {
     "test": "ava",
@@ -14,7 +14,9 @@
   },
   "keywords": [
     "router",
+    "route",
     "routes",
+    "routing",
     "server"
   ],
   "author": "Álvaro José Agámez Licha",
