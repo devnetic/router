@@ -1,30 +1,17 @@
 const { URL } = require('url')
 
+const utils = require('./support/utils')
+
 const methods = [
-  'checkout',
-  'copy',
   'delete',
   'get',
   'head',
-  'lock',
-  'merge',
-  'mkactivity',
-  'mkcol',
-  'move',
-  'm-search',
-  'notify',
   'options',
   'patch',
   'post',
-  'purge',
-  'put',
-  'report',
-  'search',
-  'subscribe',
-  'trace',
-  'unlock',
-  'unsubscribe'
+  'put'
 ]
+
 /**
  * A route in the Router module
  *
@@ -49,6 +36,8 @@ let routes = {}
  * @param {Function.<IncomingMessage, ServerResponse>} handler
  */
 const addRoute = (method, path, handler) => {
+  method = method.toUpperCase()
+
   const route = {
     handler,
     params: matchAll(/:(\w*)/g, path).map(param => param[1]),
@@ -67,97 +56,14 @@ const addRoute = (method, path, handler) => {
 }
 
 /**
- * Return the defined routes
- *
- * @returns Array<Route>
- */
-const getRoutes = () => {
-  return routes
-}
-
-// const routerMethods = {
-//   /**
-//    * Add a DELETE route handler to the router module
-//    *
-//    * @param {string} path
-//    * @param {function} handler
-//    * @returns {void}
-//    */
-//   delete: (path, handler) => {
-//     addRoute('DELETE', path, handler)
-//   },
-//   /**
-//    * Add a GET route handler to the router module
-//    *
-//    * @param {string} path
-//    * @param {function} handler
-//    * @returns {void}
-//    */
-//   get: (path, handler) => {
-//     addRoute('GET', path, handler)
-//   },
-//   /**
-//    * Add a OPTIONS route handler to the router module
-//    *
-//    * @param {string} path
-//    * @param {function} handler
-//    * @returns {void}
-//    */
-//   options: (path, handler) => {
-//     addRoute('OPTIONS', path, handler)
-//   },
-//   /**
-//    * Add a PATH route handler to the router module
-//    *
-//    * @param {string} path
-//    * @param {function} handler
-//    * @returns {void}
-//    */
-//   patch: (path, handler) => {
-//     addRoute('PATCH', path, handler)
-//   },
-//   /**
-//    * Add a POST route handler to the router module
-//    *
-//    * @param {string} path
-//    * @param {function} handler
-//    * @returns {void}
-//    */
-//   post: (path, handler) => {
-//     addRoute('POST', path, handler)
-//   },
-//   /**
-//    * Add a PUT route handler to the router module
-//    * @param {string} path
-//    * @param {function} handler
-//    * @returns {void}
-//    */
-//   put: (path, handler) => {
-//     addRoute('PUT', path, handler)
-//   }
-// }
-
-/**
- * Set the routes to a complete new ones
- *
- * @param {Array<Route>} newRoutes
- * @returns {void}
- */
-const setRoutes = (newRoutes) => {
-  routes = newRoutes
-
-  return proxy
-}
-
-/**
- * Verify if a route exist
+ * Check if a route exist
  *
  * @param {string} path Route path to verify
  * @param {string} method Route method
  *
  * @returns {Array<Route>} The routes that match the criteria
  */
-const verifyRoute = (path, method) => {
+const checkRoute = (path, method) => {
   const parsedUrl = new URL(path, 'rel:///')
 
   // If the method don't exist in the router return empty routes
@@ -185,9 +91,53 @@ const verifyRoute = (path, method) => {
   }, [])
 }
 
+/**
+ * Return the defined routes
+ *
+ * @returns Array<Route>
+ */
+const getRoutes = () => {
+  return routes
+}
+
+const group = (name, routes) => {
+  routes.forEach(route => {
+    addRoute(route.method, `/${name}/${route.path}`, route.handler)
+  })
+}
+
+/**
+ * Set the routes to a complete new ones
+ *
+ * @param {Array<Route>} newRoutes
+ * @returns {void}
+ */
+const setRoutes = (newRoutes) => {
+  routes = newRoutes
+
+  return proxy
+}
+
+/**
+ * Verify if a route exist
+ *
+ * @deprecated since version 2.0.0
+ * @param {string} path Route path to verify
+ * @param {string} method Route method
+ *
+ * @returns {Array<Route>} The routes that match the criteria
+ */
+const verifyRoute = (path, method) => {
+  utils.deprecated('verifyRoute', 'checkRoute')
+
+  return checkRoute(path, method)
+}
+
 const router = {
   addRoute,
+  checkRoute,
   getRoutes,
+  group,
   setRoutes,
   verifyRoute
 }
@@ -198,19 +148,10 @@ const proxy = new Proxy(router, {
       return Reflect.get(target, property)
     } else if (methods.includes(property)) {
       return (path, handler) => {
-        return addRoute(property.toUpperCase(), path, handler)
+        return addRoute(property, path, handler)
       }
     }
   }
 })
 
 module.exports = proxy
-
-// module.exports = {
-//   addRoute,
-//   addRouterMethod,
-//   getRoutes,
-//   ...routerMethods,
-//   setRoutes,
-//   verifyRoute
-// }

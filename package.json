@@ -1,9 +1,10 @@
 {
   "name": "@devnetic/router",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Simple router to match URLs.",
   "main": "index.js",
   "scripts": {
+    "coverage": "nyc ava",
     "test": "ava",
     "test:watch": "ava --watch",
     "lint": "standard"
@@ -19,6 +20,9 @@
     "routing",
     "server"
   ],
+  "files": [
+    "src/**/*"
+  ],
   "author": "Álvaro José Agámez Licha",
   "license": "MIT",
   "bugs": {
@@ -27,6 +31,8 @@
   "homepage": "https://github.com/devnetic/router#readme",
   "devDependencies": {
     "ava": "^2.3.0",
+    "nyc": "^14.1.1",
+    "sinon": "^7.4.2",
     "standard": "^14.1.0"
   }
 }

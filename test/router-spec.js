@@ -1,6 +1,8 @@
 import test from 'ava'
+import sinon from 'sinon'
 
 import router from './../src/router'
+import utils from './../src/support/utils'
 
 test.beforeEach(t => {
   router.setRoutes({})
@@ -74,6 +76,10 @@ test.serial('should add multiple routes', t => {
   t.deepEqual(router.getRoutes(), expected)
 })
 
+test.serial('should return empty array when no routes defined', t => {
+  t.deepEqual(router.checkRoute('/route', 'GET'), [])
+})
+
 test.serial('should verify correct route', t => {
   const method = 'GET'
   const handler = (request, response) => {}
@@ -88,7 +94,7 @@ test.serial('should verify correct route', t => {
   router.get('/route', handler)
   router.get('/route/:id', handler)
 
-  t.deepEqual(router.verifyRoute('/route', 'GET'), [expected])
+  t.deepEqual(router.checkRoute('/route', 'GET'), [expected])
 })
 
 test.serial('should verify correct route with param', t => {
@@ -106,7 +112,15 @@ test.serial('should verify correct route with param', t => {
   router.get('/route', handler)
   router.get('/route/:id', handler)
 
-  t.deepEqual(router.verifyRoute('/route/10', 'GET'), [expected])
+  t.deepEqual(router.checkRoute('/route/10', 'GET'), [expected])
+})
+
+test.serial('calling verify should show deprecated message', t => {
+  sinon.spy(utils, 'deprecated')
+
+  router.verifyRoute('/route/10', 'GET')
+
+  t.true(utils.deprecated.calledWith('verifyRoute', 'checkRoute'))
 })
 
 test.serial('should verify correct route with query params', t => {
@@ -125,5 +139,32 @@ test.serial('should verify correct route with query params', t => {
 
   router.get('/route', handler)
 
-  t.deepEqual(router.verifyRoute('/route?limit=10&offset=2', 'GET'), [expected])
+  t.deepEqual(router.checkRoute('/route?limit=10&offset=2', 'GET'), [expected])
+})
+
+test.serial('should verify correct grouped route', t => {
+  const method = 'POST'
+  const group = 'v1'
+  const handler = (request, response) => {}
+  const expected = {
+    handler,
+    params: {},
+    path: /^\/v1\/login$/,
+    method,
+    query: {
+    }
+  }
+  const routes = [{
+    method: 'post',
+    path: 'login',
+    handler
+  }, {
+    method: 'post',
+    path: 'register',
+    handler
+  }]
+
+  router.group(group, routes)
+
+  t.deepEqual(router.checkRoute(`${group}/login`, method), [expected])
 })

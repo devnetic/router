@@ -1,4 +1,14 @@
 /**
+ * Show a deprecated method message in the console
+ *
+ * @param {string} method
+ * @param {string} alternative
+ */
+const deprecated = (method, alternative) => {
+  console.log(`The method ${method}() is deprecated, use ${alternative}() instead.`)
+}
+
+/**
  * Transforms a list of key-value pairs into an object.
  *
  * @param {*} iterable An iterable such as Array or Map or other objects
@@ -39,6 +49,7 @@ const matchAll = (regex, value) => {
 }
 
 module.exports = {
+  deprecated,
   fromEntries,
   matchAll
 }
