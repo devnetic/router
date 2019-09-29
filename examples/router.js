@@ -1,4 +1,4 @@
-const router = require('./../src/router')
+const router = require('./../')
 
 const handler = (request, response) => {
   console.log('request: %o, response: %o', request, response)
