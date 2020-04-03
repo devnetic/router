@@ -1,12 +1,11 @@
 import test from 'ava'
 import * as sinon from 'sinon'
 
-// import router from '../src/router'
-import Router, { Request, Response, Route, Routes, RouteHandler } from './../src/router'
+import { router, Request, Response, Route, Routes } from './../src/router'
 import * as utils from '../src/support/utils'
 
 test.beforeEach(t => {
-  Router.setRoutes({})
+  router.setRoutes({})
 })
 
 test.serial('should add get route', t => {
@@ -22,9 +21,9 @@ test.serial('should add get route', t => {
     }]
   }
 
-  Router.get('/route', handler)
+  router.get('/route', handler)
 
-  t.deepEqual(Router.getRoutes(), expected)
+  t.deepEqual(router.getRoutes(), expected)
 })
 
 test.serial('should add post route', t => {
@@ -40,9 +39,9 @@ test.serial('should add post route', t => {
     }]
   }
 
-  Router.post('/route', handler)
+  router.post('/route', handler)
 
-  t.deepEqual(Router.getRoutes(), expected)
+  t.deepEqual(router.getRoutes(), expected)
 })
 
 test.serial('should add multiple routes', t => {
@@ -70,15 +69,15 @@ test.serial('should add multiple routes', t => {
     }]
   }
 
-  Router.get('/route', handler)
-  Router.get('/route/:id', handler)
-  Router.delete('/route/:id', handler)
+  router.get('/route', handler)
+  router.get('/route/:id', handler)
+  router.delete('/route/:id', handler)
 
-  t.deepEqual(Router.getRoutes(), expected)
+  t.deepEqual(router.getRoutes(), expected)
 })
 
 test.serial('should return empty array when no routes defined', t => {
-  t.deepEqual(Router.checkRoute('/route', 'GET'), [])
+  t.deepEqual(router.checkRoute('/route', 'GET'), [])
 })
 
 test.serial('should verify correct route', t => {
@@ -92,10 +91,10 @@ test.serial('should verify correct route', t => {
     query: {}
   }
 
-  Router.get('/route', handler)
-  Router.get('/route/:id', handler)
+  router.get('/route', handler)
+  router.get('/route/:id', handler)
 
-  t.deepEqual(Router.checkRoute('/route', 'GET'), [expected])
+  t.deepEqual(router.checkRoute('/route', 'GET'), [expected])
 })
 
 test.serial('should verify correct route with param', t => {
@@ -110,18 +109,18 @@ test.serial('should verify correct route with param', t => {
     }
   }
 
-  Router.get('/route', handler)
-  Router.get('/route/:id', handler)
+  router.get('/route', handler)
+  router.get('/route/:id', handler)
 
-  t.deepEqual(Router.checkRoute('/route/10', 'GET'), [expected])
+  t.deepEqual(router.checkRoute('/route/10', 'GET'), [expected])
 })
 
 test.serial('calling verify should show deprecated message', t => {
   sinon.spy(utils, 'deprecated')
 
-  Router.verifyRoute('/route/10', 'GET')
+  router.verifyRoute('/route/10', 'GET')
 
-  // t.true(utils.deprecated.calledWith('verifyRoute', 'checkRoute'))
+  t.true((utils.deprecated as any).calledWith('verifyRoute', 'checkRoute'))
 })
 
 test.serial('should verify correct route with query params', t => {
@@ -138,9 +137,9 @@ test.serial('should verify correct route with query params', t => {
     }
   }
 
-  Router.get('/route', handler)
+  router.get('/route', handler)
 
-  t.deepEqual(Router.checkRoute('/route?limit=10&offset=2', 'GET'), [expected])
+  t.deepEqual(router.checkRoute('/route?limit=10&offset=2', 'GET'), [expected])
 })
 
 test.serial('should verify correct grouped route', t => {
@@ -169,7 +168,7 @@ test.serial('should verify correct grouped route', t => {
     handler
   }]
 
-  Router.group(group, routes)
+  router.group(group, routes)
 
-  t.deepEqual(Router.checkRoute(`${group}/login`, method), [expected])
+  t.deepEqual(router.checkRoute(`${group}/login`, method), [expected])
 })

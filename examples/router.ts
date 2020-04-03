@@ -1,29 +1,27 @@
-// import { IncomingMessage, ServerResponse } from 'http'
-
-import Router, { Request, Response, Route, RouteHandler } from './../src/router'
+import { router, Request, Response, Route, RouteHandler } from './../src/router'
 
 const handler: RouteHandler = (request: Request, response: Response) => {
   console.log('request: %o, response: %o', request, response)
 }
 
-Router.delete('/users', handler)
-Router.get('/users', handler)
-Router.patch('/users', handler)
-Router.post('/users', handler)
-Router.put('/users', handler)
-Router.get('/users/:id', handler)
+router.delete('/users', handler)
+router.get('/users', handler)
+router.patch('/users', handler)
+router.post('/users', handler)
+router.put('/users', handler)
+router.get('/users/:id', handler)
   .get('/users/favorites/:id', handler)
 
-Router.checkRoute('/users', 'DELETE')
-Router.checkRoute('/users', 'GET')
-Router.checkRoute('/users', 'PATCH')
-Router.checkRoute('/users', 'POST')
-Router.checkRoute('/users', 'PUT')
-Router.checkRoute('/users/1', 'GET')
-Router.checkRoute('/users/favorites/1', 'GET')
+router.checkRoute('/users', 'DELETE')
+router.checkRoute('/users', 'GET')
+router.checkRoute('/users', 'PATCH')
+router.checkRoute('/users', 'POST')
+router.checkRoute('/users', 'PUT')
+router.checkRoute('/users/1', 'GET')
+router.checkRoute('/users/favorites/1', 'GET')
 
 // checkRoute method return a array with all routes that match the pattern
-Router.checkRoute('/users?limit=10&offset=2', 'GET').forEach((route: Route) => {
+router.checkRoute('/users?limit=10&offset=2', 'GET').forEach((route: Route) => {
   const request = <Request> {
     // params: route.params,
     // query: route.query
@@ -34,8 +32,8 @@ Router.checkRoute('/users?limit=10&offset=2', 'GET').forEach((route: Route) => {
   route.handler(request, response)
 })
 
-Router.setRoutes({})
-console.log('Routes: %o', Router.getRoutes())
+router.setRoutes({})
+console.log('Routes: %o', router.getRoutes())
 
 const groupRoutes: Array<Route> = [{
   method: 'post',
@@ -51,8 +49,8 @@ const groupRoutes: Array<Route> = [{
   handler
 }]
 
-Router.group('v1', groupRoutes)
-console.log(Router.checkRoute('/v1/login', 'POST'))
-console.log(Router.verifyRoute('/v1/login', 'POST'))
+router.group('v1', groupRoutes)
+console.log(router.checkRoute('/v1/login', 'POST'))
+console.log(router.verifyRoute('/v1/login', 'POST'))
 
-console.log('Routes: %o', Router.getRoutes())
+console.log('Routes: %o', router.getRoutes())

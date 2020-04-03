@@ -3,7 +3,7 @@ import { URL } from 'url'
 
 import * as utils from './support/utils'
 
-interface Router {
+export interface Router {
   checkRoute(path: string, method: string): Array<Route>;
   delete(path: string, handler: RouteHandler): Router;
   get(path: string, handler: RouteHandler): Router;
@@ -16,20 +16,20 @@ interface Router {
   verifyRoute(path: string, method: string): Array<Route>;
 }
 
-interface Request extends IncomingMessage {
+export interface Request extends IncomingMessage {
   params: Object;
   query: Object;
 }
 
-interface Response extends ServerResponse { }
+export interface Response extends ServerResponse { }
 
-interface RouteHandler {
+export interface RouteHandler {
   (request: Request, response: Response): void
 }
 
 type RouteParams = Record<string, string | undefined>
 
-interface Route {
+export interface Route {
   handler: RouteHandler;
   params: RouteParams;
   method: string;
@@ -37,7 +37,7 @@ interface Route {
   query: Object;
 }
 
-interface Routes {
+export interface Routes {
   [key: string]: Array<Route>;
 }
 
@@ -86,7 +86,7 @@ const addRoute = (method: string, path: string, handler: RouteHandler) => {
 
   routes[method].push(route)
 
-  return proxy as Router
+  return router as Router
 }
 
 /**
@@ -148,7 +148,7 @@ const group = (name: string, routes: Array<Route>) => {
 const setRoutes = (newRoutes: Routes): Router => {
   routes = newRoutes
 
-  return proxy as Router
+  return router as Router
 }
 
 /**
@@ -166,7 +166,7 @@ const verifyRoute = (path: string, method: string) => {
   return checkRoute(path, method)
 }
 
-const router = {
+const proxyTarget = {
   addRoute,
   checkRoute,
   getRoutes,
@@ -175,7 +175,7 @@ const router = {
   verifyRoute
 }
 
-const proxy = new Proxy(router, {
+export const router = new Proxy(proxyTarget, {
   get(target: Object, property: string) {
     if (Reflect.has(target, property)) {
       return Reflect.get(target, property)
@@ -185,14 +185,4 @@ const proxy = new Proxy(router, {
       }
     }
   }
-})
-
-export default proxy as Router
-
-export {
-  Request,
-  Response,
-  Route,
-  RouteHandler,
-  Routes
-}
+}) as Router

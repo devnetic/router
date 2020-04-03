@@ -1,15 +1,24 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "outDir": "./lib",
-    "sourceMap": true,
+    "allowJs": false,
     "declaration": true,
-    "strict": true
+    "esModuleInterop": false,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "outDir": "./dist",
+    "sourceMap": true,
+    "strict": true,
+    "target": "ES2015"
   },
   "include": [
+    "./index.ts",
     "./src/**/*",
     "./examples/**/*",
     "./test/**/*"
   ],
+  "exclude": [
+    "node_modules",
+    "build"
+  ]
 }

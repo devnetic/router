@@ -22,9 +22,5 @@ test('deprecated method should print the correct message', t => {
   const alternative = 'checkRoute'
   const message = `The method ${method}() is deprecated, use ${alternative}() instead.`
 
-  sinon.spy(console, 'log')
-
-  utils.deprecated(method, alternative)
-
-  // t.true(console.log.calledWith(message))
+  t.is(utils.deprecated(method, alternative), message)
 })
