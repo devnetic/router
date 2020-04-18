@@ -1,6 +1,6 @@
 interface RegExpMath extends Array<any> {
-  index: number;
-  input: any;
+  index: number
+  input: any
 }
 
 /**
@@ -22,10 +22,9 @@ const deprecated = (method: string, alternative: string): string => {
  * @returns A new object whose properties are given by the entries of the
  * iterable.
  */
-const fromEntries = (iterable: Iterable<any>|Array<any>): Object => {
-  return Array.from(iterable).reduce((obj, [key, val]) => {
-    obj[key] = val
-    return obj
+const fromEntries = (entries: IterableIterator<[string, string]>): Object => {
+  return Array.from(entries).reduce((result: Object, [key, value]: [string, string]) => {
+    return { ...result, [key]: value }
   }, {})
 }
 
@@ -37,11 +36,11 @@ const fromEntries = (iterable: Iterable<any>|Array<any>): Object => {
  * @param {string} value
  * @returns {Array}
  */
-const matchAll = (regex: RegExp, value: string): Array<RegExpMath> => {
+const matchAll = (regex: RegExp, value: string): RegExpMath[] => {
   let match: RegExpMath
-  const matches: Array<RegExpMath> = []
+  const matches: RegExpMath[] = []
 
-  while ((match = <RegExpMath> regex.exec(value)) !== null) {
+  while ((match = regex.exec(value) as RegExpMath) !== null) {
     // This is necessary to avoid infinite loops with zero-width matches
     if (match.index === regex.lastIndex) {
       regex.lastIndex++

@@ -1,8 +1,6 @@
 import test from 'ava'
-import * as sinon from 'sinon'
 
-import { router, Request, Response, Route, Routes } from './../src/router'
-import * as utils from '../src/support/utils'
+import { router, Request, Response, Route, Routes, RouteHandler, GroupRoute } from './../src/'
 
 test.beforeEach(t => {
   router.setRoutes({})
@@ -10,7 +8,7 @@ test.beforeEach(t => {
 
 test.serial('should add get route', t => {
   const method = 'GET'
-  const handler = (request: Request, response: Response) => { }
+  const handler: RouteHandler = (request: Request, response: Response) => { }
   const expected: Routes = {
     [method]: [{
       handler,
@@ -23,7 +21,7 @@ test.serial('should add get route', t => {
 
   router.get('/route', handler)
 
-  t.deepEqual(router.getRoutes(), expected)
+  t.deepEqual(router.getRegisteredRoutes(), expected)
 })
 
 test.serial('should add post route', t => {
@@ -41,7 +39,7 @@ test.serial('should add post route', t => {
 
   router.post('/route', handler)
 
-  t.deepEqual(router.getRoutes(), expected)
+  t.deepEqual(router.getRegisteredRoutes(), expected)
 })
 
 test.serial('should add multiple routes', t => {
@@ -73,60 +71,52 @@ test.serial('should add multiple routes', t => {
   router.get('/route/:id', handler)
   router.delete('/route/:id', handler)
 
-  t.deepEqual(router.getRoutes(), expected)
+  t.deepEqual(router.getRegisteredRoutes(), expected)
 })
 
 test.serial('should return empty array when no routes defined', t => {
-  t.deepEqual(router.checkRoute('/route', 'GET'), [])
+  t.deepEqual(router.getRoutes('/route', 'GET'), [])
 })
 
 test.serial('should verify correct route', t => {
   const method = 'GET'
   const handler = (request: Request, response: Response) => {}
-  const expected = {
+  const expected: Array<Route> = [{
     handler,
     params: {},
     path: /^\/route$/,
     method,
     query: {}
-  }
+  }]
 
   router.get('/route', handler)
   router.get('/route/:id', handler)
 
-  t.deepEqual(router.checkRoute('/route', 'GET'), [expected])
+  t.deepEqual(router.getRoutes('/route', 'GET'), expected)
 })
 
 test.serial('should verify correct route with param', t => {
   const method = 'GET'
   const handler = (request: Request, response: Response) => {}
-  const expected = {
+  const expected: Array<Route> = [{
     handler,
     params: { id: '10' },
     path: /^\/route\/([A-Za-z0-9_-]+)$/,
     method,
     query: {
     }
-  }
+  }]
 
   router.get('/route', handler)
   router.get('/route/:id', handler)
 
-  t.deepEqual(router.checkRoute('/route/10', 'GET'), [expected])
-})
-
-test.serial('calling verify should show deprecated message', t => {
-  sinon.spy(utils, 'deprecated')
-
-  router.verifyRoute('/route/10', 'GET')
-
-  t.true((utils.deprecated as any).calledWith('verifyRoute', 'checkRoute'))
+  t.deepEqual(router.getRoutes('/route/10', 'GET'), expected)
 })
 
 test.serial('should verify correct route with query params', t => {
   const method = 'GET'
   const handler = (request: Request, response: Response) => {}
-  const expected = {
+  const expected: Array<Route> = [{
     handler,
     params: {},
     path: /^\/route$/,
@@ -135,40 +125,36 @@ test.serial('should verify correct route with query params', t => {
       limit: '10',
       offset: '2'
     }
-  }
+  }]
 
   router.get('/route', handler)
 
-  t.deepEqual(router.checkRoute('/route?limit=10&offset=2', 'GET'), [expected])
+  t.deepEqual(router.getRoutes('/route?limit=10&offset=2', 'GET'), expected)
 })
 
 test.serial('should verify correct grouped route', t => {
   const method = 'POST'
   const group = 'v1'
   const handler = (request: Request, response: Response) => {}
-  const expected = {
+  const expected: Array<Route> = [{
     handler,
     params: {},
     path: /^\/v1\/login$/,
     method,
     query: {
     }
-  }
-  const routes: Array<Route> = [{
+  }]
+  const routes: GroupRoute[] = [{
     method: 'post',
     path: 'login',
-    params: {},
-    query: {},
     handler
   }, {
     method: 'post',
     path: 'register',
-    params: {},
-    query: {},
     handler
   }]
 
   router.group(group, routes)
 
-  t.deepEqual(router.checkRoute(`${group}/login`, method), [expected])
+  t.deepEqual(router.getRoutes(`${group}/login`, method), expected)
 })

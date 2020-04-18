@@ -2,23 +2,22 @@
   "compilerOptions": {
     "allowJs": false,
     "declaration": true,
+    "declarationDir": "./lib/types",
     "esModuleInterop": false,
     "module": "commonjs",
     "moduleResolution": "node",
     "noImplicitAny": true,
-    "outDir": "./dist",
+    "outDir": "./lib",
+    "rootDir": "./src",
     "sourceMap": true,
     "strict": true,
     "target": "ES2015"
   },
   "include": [
-    "./index.ts",
-    "./src/**/*",
-    "./examples/**/*",
-    "./test/**/*"
+    "src/**/*.ts"
   ],
   "exclude": [
-    "node_modules",
-    "build"
+    "lib",
+    "./node_modules"
   ]
 }

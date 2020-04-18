@@ -1,0 +1,4 @@
+KRO0001=Incorrect param type, the expect type is function or array of functions
+KRO0002=Incorrect params type, the expect type are string and function or string and array of functions
+KRO0003=Incorrect params number
+KRO0004=Error 404: No route handler defined for the given path [{{url}}].

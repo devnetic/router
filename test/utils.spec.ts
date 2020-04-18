@@ -1,5 +1,4 @@
 import test from 'ava'
-import * as sinon from 'sinon'
 
 import * as utils from '../src/support/utils'
 

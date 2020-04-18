@@ -3,6 +3,7 @@
 ![npm (scoped)](https://img.shields.io/npm/v/@devnetic/router)
 ![npm bundle size (scoped)](https://img.shields.io/bundlephobia/minzip/@devnetic/router?color=red)
 ![npm](https://img.shields.io/npm/dt/@devnetic/router)
+[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/feross/standard)
 ![GitHub issues](https://img.shields.io/github/issues-raw/devnetic/router)
 ![GitHub](https://img.shields.io/github/license/devnetic/router)
 
