@@ -8,13 +8,12 @@ export interface SendOptions {
   encoding: string
 }
 
+// export class Response {
 export class Response {
   /**
    * Create a new Response object
    *
-   * @param {string} body
-   * @param {string} url
-   * @param {Object} response
+   * @param {ServerResponse} response
    */
   constructor (private response: ServerResponse) {
     return new Proxy(this, {
@@ -44,10 +43,6 @@ export class Response {
     return this
   }
 
-  end (data: any, encoding: string, callback?: () => void): void {
-    return this.response.end(data, encoding, callback)
-  }
-
   header (field: string, value: string): Response {
     this.response.setHeader(field, value)
 
@@ -55,23 +50,22 @@ export class Response {
   }
 
   /**
-   *
-   * @param {object} data
-   * @param {number} statusCode
-   * @param {string} encoding
-   */
-  json (data: Object = {}, statusCode: number = 200, encoding: string = 'utf-8'): Response {
+ *
+ * @param {object} data
+ * @param {number} statusCode
+ * @param {string} encoding
+ */
+  json (data: Object, statusCode: number = 200, encoding: string = 'utf-8'): Response {
     this.send(JSON.stringify(data), { statusCode, contentType: 'application/json', encoding })
 
     return this
   }
 
   /**
-   *
-   * @param {string} data
-   * @param {number} [statusCode=200]
-   * @param {string} [contentType='application/json']
-   */
+ *
+ * @param {string} data
+ * @param {SendOptions} [<statusCode=200, contentType='application/json', encoding = 'utf-8'>]
+ */
   send (data: string, { statusCode = 200, contentType = 'text/plain', encoding = 'utf-8' }: SendOptions): Response {
     this.response.writeHead(statusCode, {
       'Content-Length': Buffer.byteLength(data),

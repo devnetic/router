@@ -5,7 +5,7 @@ const { createServer } = require('http')
 const requestHandler = (request, response) => {
   console.log('Route Handler')
 
-  response.cookie('some-key', 'some-value')
+  response.cookie('key', 'some-value')
 
   const data = {
     status: 'ok',

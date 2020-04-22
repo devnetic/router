@@ -1,8 +1,8 @@
-import { createServer, ServerResponse } from 'http'
+import { createServer } from 'http'
 
-import { router, Request, GroupRoute, RouteHandler } from './../src/router'
+import { router, Request, Response, GroupRoute, RouteHandler } from './../src/'
 
-const requestHandler: RouteHandler = (request: Request, response: ServerResponse): void => {
+const requestHandler: RouteHandler = (request: Request, response: Response): void => {
   console.log('Route Handler')
 
   const data = {
@@ -48,7 +48,7 @@ const groupRoutes: GroupRoute[] = [{
 
 router.group('v1', groupRoutes)
 
-const server = createServer(router.init)
+const server = createServer(router.start)
 
 server.listen(3000, () =>  {
   console.log('listening in the port 3000');

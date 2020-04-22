@@ -16,7 +16,7 @@ export interface Router {
   get(path: string, handler: RouteHandler): Router
   getRegisteredRoutes(): Routes
   group(name: string, routes: GroupRoute[]): Routes
-  start (request: Request, response: Response): void
+  start(request: IncomingMessage, response: ServerResponse): void
   patch(path: string, handler: RouteHandler): Router
   post(path: string, handler: RouteHandler): Router
   put(path: string, handler: RouteHandler): Router
@@ -34,6 +34,7 @@ export interface Request extends IncomingMessage {
   query?: Object
 }
 
+// export type RouteHandler = (request: IncomingMessage, response: ServerResponse) => void
 export type RouteHandler = (request: Request, response: Response) => void
 // export type RouteHandler = (request: Request, response: ServerResponse) => void
 
