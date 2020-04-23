@@ -20,6 +20,11 @@
     "routing",
     "server"
   ],
+  "ava": {
+    "require": [
+      "esm"
+    ]
+  },
   "files": [
     "src/**/*"
   ],
@@ -34,5 +39,9 @@
     "nyc": "^14.1.1",
     "sinon": "^7.4.2",
     "standard": "^14.1.0"
+  },
+  "dependencies": {
+    "@devnetic/load-env": "^1.1.0",
+    "esm": "^3.2.25"
   }
 }

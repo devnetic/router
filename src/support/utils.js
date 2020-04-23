@@ -3,23 +3,23 @@
  *
  * @param {string} method
  * @param {string} alternative
+ * @returns {string}
  */
 const deprecated = (method, alternative) => {
-  console.log(`The method ${method}() is deprecated, use ${alternative}() instead.`)
+  return `The method ${method}() is deprecated, use ${alternative}() instead.`
 }
 
 /**
  * Transforms a list of key-value pairs into an object.
  *
- * @param {*} iterable An iterable such as Array or Map or other objects
+ * @param {Iterable} iterable An iterable such as Array or Map or other objects
  * implementing the iterable protocol.
- * @returns A new object whose properties are given by the entries of the
+ * @returns {Object<string, string>} A new object whose properties are given by the entries of the
  * iterable.
  */
-const fromEntries = (iterable) => {
-  return [...iterable].reduce((obj, [key, val]) => {
-    obj[key] = val
-    return obj
+const fromEntries = (entries) => {
+  return Array.from(entries).reduce((result, [key, value]) => {
+    return { ...result, [key]: value }
   }, {})
 }
 
@@ -28,7 +28,7 @@ const fromEntries = (iterable) => {
  * matches to the regular expression given in pattern and return them.
  *
  * @param {Object} regex
- * @param {*} value
+ * @param {string} value
  * @returns {Array}
  */
 const matchAll = (regex, value) => {
@@ -48,8 +48,4 @@ const matchAll = (regex, value) => {
   return matches
 }
 
-module.exports = {
-  deprecated,
-  fromEntries,
-  matchAll
-}
+export { deprecated, fromEntries, matchAll }

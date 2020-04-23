@@ -1,50 +1,50 @@
-const router = require('./../')
+import { createServer } from 'http'
 
-const handler = (request, response) => {
-  console.log('request: %o, response: %o', request, response)
-}
+import { router } from './../src'
 
-router.delete('/users', handler)
-router.get('/users', handler)
-router.patch('/users', handler)
-router.post('/users', handler)
-router.put('/users', handler)
-router.get('/users/:id', handler)
-  .get('/users/favorites/:id', handler)
+const requestHandler = (request, response) => {
+  console.log('Route Handler')
 
-router.checkRoute('/users', 'DELETE')
-router.checkRoute('/users', 'GET')
-router.checkRoute('/users', 'PATCH')
-router.checkRoute('/users', 'POST')
-router.checkRoute('/users', 'PUT')
-router.checkRoute('/users/1', 'GET')
-router.checkRoute('/users/favorites/1', 'GET')
+  response.cookie('key', 'some-value')
 
-// checkRoute method return a array with all routes that match the pattern
-router.checkRoute('/users?limit=10&offset=2', 'GET').forEach(route => {
-  const request = {
-    params: route.params,
-    query: route.query
+  const data = {
+    status: 'ok',
+    body: request.body
   }
 
-  route.handler(request, {})
-})
+  response.writeHead(200, {
+    'Content-Type': 'application/json',
+    'X-Powered-By': 'kiirus-router'
+  })
 
-router.setRoutes({})
-console.log('Routes: %o', router.getRoutes())
+  response.end(JSON.stringify(data))
+}
 
-const groupRoutes = [{
-  method: 'post',
-  path: 'login',
-  handler
-}, {
-  method: 'post',
-  path: 'register',
-  handler
+const handlers = [(request, response) => {
+  console.log('Route-level middleware')
+}, (request, response) => {
+  console.log('Route-level middleware')
 }]
 
-router.group('v1', groupRoutes)
-console.log(router.checkRoute('/v1/login', 'POST'))
-console.log(router.verifyRoute('/v1/login', 'POST'))
+router.use((request, response) => {
+  request.params = { foo: 'value' }
+  console.log('Application-level middleware')
+})
 
-console.log('Routes: %o', router.getRoutes())
+router.use('/users', (request, response) => {
+  console.log('Route-level middleware')
+})
+
+router.use('/posters', handlers)
+
+router.get('/users', requestHandler)
+router.get('/posters', requestHandler)
+router.get('/users/:id', requestHandler)
+
+router.post('/users', requestHandler)
+
+const server = createServer(router.start)
+
+server.listen(3000, () => {
+  console.log('listening in the port 3000');
+})
