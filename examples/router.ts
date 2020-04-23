@@ -9,10 +9,13 @@ const requestHandler: RouteHandler = (request: Request, response: Response): voi
     'status': 'ok'
   }
 
+  response.cookie('key', 'some-value')
+
   response.writeHead(200, {
     'Content-Type': 'application/json',
     'X-Powered-By': 'kiirus-router'
   });
+
   response.end(JSON.stringify(data))
 }
 

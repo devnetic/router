@@ -3,7 +3,7 @@ import { URL } from 'url'
 
 import * as loadEnv from '@devnetic/load-env'
 
-import { Response } from './'
+import { /* createResponse, */ Response } from './'
 import * as utils from './support/utils'
 import { formData, getBoundary, urlEncoded } from './parser'
 import { parse as parseCookie, Cookie } from './cookie'
@@ -279,8 +279,11 @@ const start = (request: Request, response: ServerResponse): void => {
     getBody(request, (body: RequestBody) => {
       request.body = body
 
-      route.handler(request, new Response(response))
-      // route.handler(request, new Response(request))
+      // route.handler(request, createResponse(response))
+      // route.handler(request, Response)
+
+      route.handler(request, new Response(request))
+      // route.handler(request, new Response(response))
       // route.handler(request, response)
     })
   }
