@@ -2,9 +2,9 @@ import { IncomingMessage, ServerResponse } from 'http'
 import { URL } from 'url'
 
 import * as loadEnv from '@devnetic/load-env'
+import * as utils from '@devnetic/utils'
 
 import { /* createResponse, */ Response } from './'
-import * as utils from './support/utils'
 import { formData, getBoundary, urlEncoded } from './parser'
 import { parse as parseCookie, Cookie } from './cookie'
 
@@ -214,7 +214,7 @@ const group = (name: string, routes: GroupRoute[]): void => {
  * @param {string} path
  */
 const setParamsKey = (path: string): RouteParams => {
-  return utils.matchAll(/:(\w*)/g, path).reduce((params: RouteParams, current: string[]) => {
+  return utils.matchAll(path, /:(\w*)/g).reduce((params: RouteParams, current: string[]) => {
     params[current[1]] = undefined
 
     return params
@@ -279,12 +279,7 @@ const start = (request: Request, response: ServerResponse): void => {
     getBody(request, (body: RequestBody) => {
       request.body = body
 
-      // route.handler(request, createResponse(response))
-      // route.handler(request, Response)
-
       route.handler(request, new Response(request))
-      // route.handler(request, new Response(response))
-      // route.handler(request, response)
     })
   }
 }

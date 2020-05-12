@@ -1,3 +1,5 @@
+import * as utils from '@devnetic/utils'
+
 /**
  * RegExp to match field-content in RFC 7230 sec 3.2
  *
@@ -12,28 +14,27 @@ const encode = encodeURIComponent
 
 export interface CookieOptions {
   domain?: string
-  expires?: Date
+  expires?: string
   httpOnly?: boolean
-  maxAge?: number
+  maxAge?: number | string
   path?: string
   sameSite?: string
   secure?: boolean
 }
 
 export interface Cookie extends CookieOptions {
-  name: string
-  value: string
+  [key: string]: any
 }
 
 export const create = (name: string, value: string, options: CookieOptions = {}): string => {
   validate(name, value, options)
 
-  const cookie = `${encode(name)}=${encode(value ?? '')}`
+  const cookie = `${encode(name)}=${encode(value)}`
   const domain = options.domain !== undefined ? `;Domain=${String(options.domain)}` : ''
-  const expires = options.expires !== undefined ? `;Expires=${options.expires.toUTCString()}` : ''
+  const expires = options.expires !== undefined ? `;Expires=${options.expires}` : ''
   const httpOnly = options.httpOnly !== undefined ? ';HttpOnly' : ''
   const maxAge = options.maxAge !== undefined ? `;Max-Age=${options.maxAge}` : ''
-  const path = `;Path=${options.path ?? '/'}`
+  const path = `;Path=${options.path !== undefined ? options.path : '/'}`
   const sameSite = options.sameSite !== undefined ? `;SameSite=${options.sameSite}` : ''
   const secure = options.secure !== undefined ? ';Secure' : ''
 
@@ -45,7 +46,7 @@ export const parse = (cookie: string): Cookie => {
   return cookie.split(';').reduce((result: any, current: string) => {
     const [key, value] = current.split('=')
 
-    result[key] = decode(value)
+    result[utils.camelCase(key)] = value ? decode(value) : true
 
     return result
   }, {}) as Cookie
@@ -67,20 +68,20 @@ const validate = (name: string, value: string, options: CookieOptions = {}): boo
   }
 
   if (options.expires !== undefined) {
-    if (!(options.expires instanceof Date)) {
-      throw new TypeError('option expires is invalid')
+    if (Number.isNaN(Date.parse(options.expires))) {
+      throw new TypeError('Option expires is invalid')
     }
   }
 
   if (options.path !== undefined) {
     if (!fieldContentRegExp.test(options.path)) {
-      throw new TypeError('option path is invalid')
+      throw new TypeError('Option path is invalid')
     }
   }
 
   if (options.sameSite !== undefined) {
     if (!['Lax', 'None', 'Strict'].includes(options.sameSite)) {
-      throw new TypeError('option sameSite is invalid')
+      throw new TypeError('Option sameSite is invalid')
     }
   }
 

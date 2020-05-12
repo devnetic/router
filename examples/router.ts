@@ -5,8 +5,9 @@ import { router, Request, Response, GroupRoute, RouteHandler } from './../src/'
 const requestHandler: RouteHandler = (request: Request, response: Response): void => {
   console.log('Route Handler')
 
-  const data = {
-    'status': 'ok'
+  const data: Object = {
+    status: 'ok',
+    body: request.body
   }
 
   response.cookie('key', 'some-value')
@@ -38,6 +39,7 @@ router.use('/posters', handlers)
 router.get('/users', requestHandler)
 router.get('/posters', requestHandler)
 router.get('/users/:id', requestHandler)
+router.post('/users', requestHandler)
 
 const groupRoutes: GroupRoute[] = [{
   method: 'post',

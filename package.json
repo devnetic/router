@@ -61,6 +61,7 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "@devnetic/load-env": "^1.1.0"
+    "@devnetic/load-env": "^1.1.0",
+    "@devnetic/utils": "^1.0.2"
   }
 }

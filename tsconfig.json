@@ -3,7 +3,7 @@
     "allowJs": false,
     "declaration": true,
     "declarationDir": "./lib/types",
-    "esModuleInterop": false,
+    "esModuleInterop": true,
     "module": "commonjs",
     "moduleResolution": "node",
     "noImplicitAny": true,
