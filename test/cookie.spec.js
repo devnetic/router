@@ -1,10 +1,10 @@
-import test from 'ava'
+const test = require('ava')
 
-import { create, parse, Cookie, CookieOptions } from './../src'
+const { create, parse } = require('./../lib/cookie')
 
 test('should parse a cookie', t => {
   const cookie = 'foo=bar;Domain=https://localhost:3000;Expires=Wed, 22 Apr 2020 05:00:00 GMT;HttpOnly;Max-Age=12;Path=/;SameSite=Lax;Secure'
-  const expected: Cookie = {
+  const expected = {
     foo: 'bar',
     domain: 'https://localhost:3000',
     expires: 'Wed, 22 Apr 2020 05:00:00 GMT',
@@ -36,7 +36,7 @@ test('should create a cookie with options', t => {
   const sameSite = 'Lax'
   const secure = true
   const path = '/users'
-  const options:CookieOptions = {
+  const options = {
     domain,
     expires,
     httpOnly,
@@ -75,7 +75,7 @@ test('should throw an error when value validation fails', t => {
 test('should throw an error when domain validation fails', t => {
   const name = 'foo'
   const value = 'bar'
-  const options: CookieOptions = {
+  const options = {
     domain: 'https://localhost:3000\n'
   }
 
@@ -89,7 +89,7 @@ test('should throw an error when domain validation fails', t => {
 test('should throw an error when expires validation fails', t => {
   const name = 'foo'
   const value = 'bar'
-  const options: CookieOptions = {
+  const options = {
     expires: ''
   }
 
@@ -103,7 +103,7 @@ test('should throw an error when expires validation fails', t => {
 test('should throw an error when path validation fails', t => {
   const name = 'foo'
   const value = 'bar'
-  const options: CookieOptions = {
+  const options = {
     path: '/\n'
   }
 
@@ -117,7 +117,7 @@ test('should throw an error when path validation fails', t => {
 test('should throw an error when sameSite validation fails', t => {
   const name = 'foo'
   const value = 'bar'
-  const options: CookieOptions = {
+  const options = {
     sameSite: ''
   }
 

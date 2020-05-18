@@ -5,7 +5,7 @@ import { create as createCookie, CookieOptions } from './cookie'
 export interface SendOptions {
   statusCode: number
   contentType: string
-  encoding: string
+  encoding: BufferEncoding
 }
 
 export class Response extends ServerResponse {
@@ -43,7 +43,7 @@ export class Response extends ServerResponse {
    * @param {number} statusCode
    * @param {string} encoding
    */
-  json (data: Object, statusCode: number = 200, encoding: string = 'utf-8'): Response {
+  json (data: Object, statusCode: number = 200, encoding: BufferEncoding = 'utf-8'): Response {
     this.send(JSON.stringify(data), { statusCode, contentType: 'application/json', encoding })
 
     return this
@@ -54,7 +54,7 @@ export class Response extends ServerResponse {
  * @param {string} data
  * @param {SendOptions} [<statusCode=200, contentType='application/json', encoding = 'utf-8'>]
  */
-  send (data: string, { statusCode = 200, contentType = 'text/plain', encoding = 'utf-8' }: SendOptions): Response {
+  send (data: any, { statusCode = 200, contentType = 'text/plain', encoding = 'utf8' }: SendOptions): Response {
     this.writeHead(statusCode, {
       'Content-Length': Buffer.byteLength(data),
       'Content-Type': contentType

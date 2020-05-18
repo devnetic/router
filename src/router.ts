@@ -11,12 +11,12 @@ import { parse as parseCookie, Cookie } from './cookie'
 loadEnv.load('./src/.errors-description')
 
 export interface Router {
-  getRoutes(path: string | undefined, method: string | undefined): Route[]
+  attach(request: Request, response: ServerResponse): void
   delete(path: string, handler: RouteHandler): Router
   get(path: string, handler: RouteHandler): Router
   getRegisteredRoutes(): Routes
+  getRoutes(path: string | undefined, method: string | undefined): Route[]
   group(name: string, routes: GroupRoute[]): Routes
-  start(request: IncomingMessage, response: ServerResponse): void
   patch(path: string, handler: RouteHandler): Router
   post(path: string, handler: RouteHandler): Router
   put(path: string, handler: RouteHandler): Router
@@ -103,6 +103,44 @@ const addRoute = (method: string, path: string, handler: RouteHandler): Router =
   routes[method].push(route)
 
   return router
+}
+
+/**
+ *
+ * @param {Request} request
+ * @param {ServerResponse} response
+ */
+const attach = (request: Request, response: ServerResponse): void => {
+  const routes = router.getRoutes(request.url, request.method)
+
+  if (routes.length === 0) {
+    console.log(getErrorMessage('KRO0004', { url: request.url }))
+
+    response.statusCode = 404
+    response.end()
+
+    return
+  }
+
+  const requestMiddlewares = middlewares.filter((middleware: Middleware) => {
+    return middleware.path === request.url || middleware.path === undefined
+  })
+
+  for (const route of routes) {
+    requestMiddlewares.map((middleware: Middleware) => {
+      middleware.handler(request, response)
+    })
+
+    if (request.headers.cookie !== undefined) {
+      request.cookie = parseCookie(request.headers.cookie)
+    }
+
+    getBody(request, (body: RequestBody) => {
+      request.body = body
+
+      route.handler(request, new Response(request))
+    })
+  }
 }
 
 /**
@@ -246,44 +284,6 @@ const setRoutes = (newRoutes: Routes): Router => {
   return router
 }
 
-/**
- *
- * @param {Request} request
- * @param {ServerResponse} response
- */
-const start = (request: Request, response: ServerResponse): void => {
-  const routes = router.getRoutes(request.url, request.method)
-
-  if (routes.length === 0) {
-    console.log(getErrorMessage('KRO0004', { url: request.url }))
-
-    response.statusCode = 404
-    response.end()
-
-    return
-  }
-
-  const requestMiddlewares = middlewares.filter((middleware: Middleware) => {
-    return middleware.path === request.url || middleware.path === undefined
-  })
-
-  for (const route of routes) {
-    requestMiddlewares.map((middleware: Middleware) => {
-      middleware.handler(request, response)
-    })
-
-    if (request.headers.cookie !== undefined) {
-      request.cookie = parseCookie(request.headers.cookie)
-    }
-
-    getBody(request, (body: RequestBody) => {
-      request.body = body
-
-      route.handler(request, new Response(request))
-    })
-  }
-}
-
 const use = (...args: any[]): void => {
   if (args.length === 1) {
     if (typeof args[0] !== 'function' && !Array.isArray(args[0])) {
@@ -336,11 +336,11 @@ const use = (...args: any[]): void => {
 
 const proxyTarget = {
   addRoute,
+  attach,
   getRegisteredRoutes,
   getRoutes,
   group,
   setRoutes,
-  start,
   use
 }
 

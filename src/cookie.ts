@@ -52,7 +52,14 @@ export const parse = (cookie: string): Cookie => {
   }, {}) as Cookie
 }
 
-const validate = (name: string, value: string, options: CookieOptions = {}): boolean => {
+/**
+ *
+ * @param {string} name
+ * @param {string} value
+ * @param {CookieOptions} [options = {}]
+ * @returns {void}
+ */
+const validate = (name: string, value: string, options: CookieOptions): void => {
   if (!fieldContentRegExp.test(name)) {
     throw new TypeError('Argument name is invalid')
   }
@@ -84,6 +91,4 @@ const validate = (name: string, value: string, options: CookieOptions = {}): boo
       throw new TypeError('Option sameSite is invalid')
     }
   }
-
-  return true
 }

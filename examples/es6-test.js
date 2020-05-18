@@ -43,8 +43,8 @@ router.get('/users/:id', requestHandler)
 
 router.post('/users', requestHandler)
 
-const server = createServer(router.start)
+const server = createServer(router.attach)
 
 server.listen(3000, () => {
-  console.log('listening in the port 3000');
+  console.log('listening in the port 3000')
 })

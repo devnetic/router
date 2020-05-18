@@ -1,6 +1,6 @@
-import test from 'ava'
+const test = require('ava')
 
-import { deprecated } from '../src/support'
+const { deprecated } = require('./../lib/support')
 
 test('deprecated method should print the correct message', t => {
   const method = 'verifyRoute'

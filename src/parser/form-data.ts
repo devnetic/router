@@ -83,7 +83,9 @@ export const formData = (multipartBodyBuffer: Buffer, boundary: string): Input[]
         lastLine = ''
       }
     } else if (state === 5) {
-      if (newLineDetected) state = 1
+      if (newLineDetected) {
+        state = 1
+      }
     }
   }
 
@@ -101,7 +103,7 @@ const transformIntoInput = (part: Part): Input => {
   const fileDataHeader = header[2]
 
   if (fileDataHeader !== undefined) {
-    input.name = fileDataHeader.split('=')[1].trim()
+    input.name = fileDataHeader.split('=')[1].trim().replace(/"/g, '')
     input.type = part.info.split(':')[1].trim()
   } else {
     input.name = header[1].split('=')[1].replace(/"/g, '')
