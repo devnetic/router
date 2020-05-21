@@ -299,3 +299,126 @@ test.serial.cb('should parse form-data body with files', t => {
 
   router.attach(request, response)
 })
+
+test.serial('should return 404 status code when there are not routes defined', t => {
+  const url = '/users'
+
+  const request = {
+    url
+  }
+  const response = {
+    end: () => {}
+  }
+
+  router.attach(request, response)
+
+  t.is(response.statusCode, 404)
+})
+
+test.serial.cb('should execute the middlewares', t => {
+  const url = '/users'
+
+  const body = {
+    id: '123',
+    name: 'John Doe'
+  }
+
+  const request = new IncomingMessage(new Socket())
+  request.url = url
+  request.method = 'GET'
+  request.headers['content-type'] = 'application/json'
+  request.push(JSON.stringify(body), 'utf8')
+  request.push(null)
+
+  const response = {
+    end: () => {}
+  }
+
+  router.use((request, response) => {
+    t.is(request.headers['content-type'], 'application/json')
+
+    t.end()
+  })
+
+  router.get(url, () => {})
+
+  router.attach(request, response)
+})
+
+test.serial.cb('should parse cookie', t => {
+  const cookie = 'foo=bar;Domain=https://localhost:3000'
+  const parsedCookie = { foo: 'bar', domain: 'https://localhost:3000' }
+  const url = '/users'
+
+  const request = new IncomingMessage(new Socket())
+  request.url = url
+  request.method = 'POST'
+  request.headers['cookie'] = cookie
+
+  const handler = (request) => {
+    t.deepEqual(request.cookie, parsedCookie)
+
+    t.end()
+  }
+
+  router.post(url, handler)
+
+  const response = {
+    end: () => { }
+  }
+
+  router.attach(request, response)
+})
+
+test.serial.cb('should set raw body for unidentified content type', t => {
+  const method = 'POST'
+  const url = '/route'
+  const handler = (request) => {
+    t.deepEqual(JSON.parse(request.body.toString()), body)
+
+    t.end()
+  }
+  const body = {
+    id: '123',
+    name: 'John Doe'
+  }
+
+  const request = new IncomingMessage(new Socket())
+  request.url = url
+  request.method = method
+  request.headers['content-type'] = 'foo/bar'
+  request.push(JSON.stringify(body), 'utf8')
+  request.push(null)
+
+  const response = {}
+
+  router.post(url, handler)
+
+  router.attach(request, response)
+})
+
+test.serial.cb('should set body for when content type is undefined', t => {
+  const method = 'POST'
+  const url = '/route'
+  const handler = (request) => {
+    t.deepEqual(JSON.parse(request.body.toString()), body)
+
+    t.end()
+  }
+  const body = {
+    id: '123',
+    name: 'John Doe'
+  }
+
+  const request = new IncomingMessage(new Socket())
+  request.url = url
+  request.method = method
+  request.push(JSON.stringify(body), 'utf8')
+  request.push(null)
+
+  const response = {}
+
+  router.post(url, handler)
+
+  router.attach(request, response)
+})

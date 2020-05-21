@@ -152,6 +152,12 @@ const attach = (request: Request, response: ServerResponse): void => {
 const getBody = (request: Request, callback: Function): void => {
   const bodyBuffer: Uint8Array[] = []
 
+  if (request.readableLength === 0) {
+    callback(undefined)
+
+    return
+  }
+
   request.on('data', (chunk) => {
     bodyBuffer.push(chunk)
   })
@@ -174,6 +180,8 @@ const getBody = (request: Request, callback: Function): void => {
           return callback(Buffer.concat(bodyBuffer))
       }
     }
+
+    return callback(Buffer.concat(bodyBuffer))
   })
 }
 
