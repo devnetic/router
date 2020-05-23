@@ -17,16 +17,16 @@ export class Response extends ServerResponse {
     this.assignSocket(request.socket)
   }
 
-  clearCookie (options: CookieOptions): Response {
+  clearCookie (name: string, options: CookieOptions): Response {
     options = { ...options, expires: new Date(1).toUTCString(), path: '/' }
 
     return this.cookie(name, '', options)
   }
 
-  cookie (name: string, value: string | Object, options?: CookieOptions): Response {
+  cookie (name: string, value: string, options?: CookieOptions): Response {
     value = typeof value === 'object' ? JSON.stringify(value) : value
 
-    this.header('Set-Cookie', createCookie(name, String(value), options))
+    this.header('Set-Cookie', createCookie(name, value, options))
 
     return this
   }

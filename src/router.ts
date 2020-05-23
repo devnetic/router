@@ -15,11 +15,13 @@ export interface Router {
   delete(path: string, handler: RouteHandler): Router
   get(path: string, handler: RouteHandler): Router
   getRegisteredRoutes(): Routes
+  getRegisteredMiddlewares(): Middleware[]
   getRoutes(path: string | undefined, method: string | undefined): Route[]
   group(name: string, routes: GroupRoute[]): Routes
   patch(path: string, handler: RouteHandler): Router
   post(path: string, handler: RouteHandler): Router
   put(path: string, handler: RouteHandler): Router
+  setMiddlewares(newMiddlewares: Middleware[]): Router
   setRoutes(newRoutes: Routes): Router
   use(handler: Function | Function[]): void
   use(path: string, handler: Function | Function[]): void
@@ -75,7 +77,7 @@ const methods = [
   'put'
 ]
 
-const middlewares: Middleware[] = []
+let middlewares: Middleware[] = []
 
 let routes: Routes = {}
 
@@ -201,6 +203,15 @@ const getErrorMessage = (code: string, messages: ErrorMessage = {}): string => {
 }
 
 /**
+ * Return the registered middlewares
+ *
+ * @returns {Middleware[]}
+ */
+const getRegisteredMiddlewares = (): Middleware[] => {
+  return middlewares
+}
+
+/**
  * Return the defined routes
  *
  * @returns {Routes}
@@ -281,6 +292,18 @@ const setParamsValue = (params: RouteParams, match: string[]): RouteParams => {
 }
 
 /**
+ * Set the middlewares to a complete new ones
+ *
+ * @param {Route[]} newRoutes
+ * @returns {void}
+ */
+const setMiddlewares = (newMiddlewares: Middleware[]): Router => {
+  middlewares = newMiddlewares
+
+  return router
+}
+
+/**
  * Set the routes to a complete new ones
  *
  * @param {Route[]} newRoutes
@@ -345,9 +368,11 @@ const use = (...args: any[]): void => {
 const proxyTarget = {
   addRoute,
   attach,
+  getRegisteredMiddlewares,
   getRegisteredRoutes,
   getRoutes,
   group,
+  setMiddlewares,
   setRoutes,
   use
 }

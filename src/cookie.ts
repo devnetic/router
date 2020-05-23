@@ -64,7 +64,7 @@ const validate = (name: string, value: string, options: CookieOptions): void => 
     throw new TypeError('Argument name is invalid')
   }
 
-  if (value !== undefined && !fieldContentRegExp.test(value)) {
+  if (value && !fieldContentRegExp.test(value)) {
     throw new TypeError('Argument value is invalid')
   }
 

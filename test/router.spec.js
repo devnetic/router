@@ -7,6 +7,7 @@ const { router } = require('./../lib/')
 const { buildFormData } = require('./utils')
 
 test.beforeEach(t => {
+  router.setMiddlewares([])
   router.setRoutes({})
 })
 
@@ -307,7 +308,7 @@ test.serial('should return 404 status code when there are not routes defined', t
     url
   }
   const response = {
-    end: () => {}
+    end: () => { }
   }
 
   router.attach(request, response)
@@ -331,7 +332,7 @@ test.serial.cb('should execute the middlewares', t => {
   request.push(null)
 
   const response = {
-    end: () => {}
+    end: () => { }
   }
 
   router.use((request, response) => {
@@ -340,9 +341,75 @@ test.serial.cb('should execute the middlewares', t => {
     t.end()
   })
 
-  router.get(url, () => {})
+  router.get(url, () => { })
 
   router.attach(request, response)
+})
+
+test('should throw an error when a invalid middleware is detected', t => {
+  let error = t.throws(() => {
+    router.use(null)
+  }, { instanceOf: Error })
+
+  t.is(error.message, 'Incorrect param type, the expect type is function or array of functions')
+
+  // error = t.throws(() => {
+  //   router.use(null, null)
+  // }, { instanceOf: Error })
+
+  // t.is(error.message, 'Incorrect params type, the expect type are string and function or string and array of functions')
+
+  error = t.throws(() => {
+    router.use()
+  }, { instanceOf: Error })
+
+  t.is(error.message, 'Incorrect params number')
+})
+
+test.serial('should add a single application-level middleware', t => {
+  const handler = () => { }
+  const registeredMiddlewares = [
+    { handler: handler, path: undefined }
+  ]
+
+  router.use(handler)
+
+  t.deepEqual(router.getRegisteredMiddlewares(), registeredMiddlewares)
+})
+
+test.serial('should add a single route-level middleware', t => {
+  const handler = () => { }
+  const registeredMiddlewares = [
+    { handler: handler, path: '/users' }
+  ]
+
+  router.use('/users', handler)
+
+  t.deepEqual(router.getRegisteredMiddlewares(), registeredMiddlewares)
+})
+
+test.serial('should add an array of application-level middlewares', t => {
+  const middlewares = [() => { }, () => { }]
+  const registeredMiddlewares = [
+    { handler: middlewares[0], path: undefined },
+    { handler: middlewares[1], path: undefined }
+  ]
+
+  router.use(middlewares)
+
+  t.deepEqual(router.getRegisteredMiddlewares(), registeredMiddlewares)
+})
+
+test.serial('should add an array of route-level middlewares', t => {
+  const middlewares = [() => { }, () => { }]
+  const registeredMiddlewares = [
+    { handler: middlewares[0], path: '/users' },
+    { handler: middlewares[1], path: '/users' }
+  ]
+
+  router.use('/users', middlewares)
+
+  t.deepEqual(router.getRegisteredMiddlewares(), registeredMiddlewares)
 })
 
 test.serial.cb('should parse cookie', t => {
