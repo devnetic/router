@@ -8,7 +8,7 @@
     "build": "npm run clean && tsc",
     "build:watch": "npm run build -- -w",
     "clean": "rm -rf lib",
-    "coverage": "npm run build && nyc ava",
+    "coverage": "nyc ava",
     "lint": "eslint src/* --ext .ts",
     "prepublishOnly": "npm run build && npm run lint",
     "test": "ava",

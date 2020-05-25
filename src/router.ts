@@ -116,7 +116,7 @@ const attach = (request: Request, response: ServerResponse): void => {
   const routes = router.getRoutes(request.url, request.method)
 
   if (routes.length === 0) {
-    console.log(getErrorMessage('KRO0004', { url: request.url }))
+    console.log(getErrorMessage('KRO0005', { url: request.url }))
 
     response.statusCode = 404
     response.end()
@@ -339,9 +339,11 @@ const use = (...args: any[]): void => {
   }
 
   if (args.length === 2) {
-    if (typeof args[0] !== 'string' && (typeof args[1] !== 'function' ||
-      !Array.isArray(args[1]))
-    ) {
+    if (typeof args[0] !== 'string' || args[0].length === 0) {
+      throw new Error(getErrorMessage('KRO0002'))
+    }
+
+    if (typeof args[1] !== 'function' && !Array.isArray(args[1])) {
       throw new Error(getErrorMessage('KRO0002'))
     }
 
@@ -353,10 +355,16 @@ const use = (...args: any[]): void => {
 
       return
     } else {
-      middlewares.push(...args[1].map((middleware: Function) => ({
-        path: args[0],
-        handler: middleware
-      })))
+      middlewares.push(...args[1].map((middleware: Function) => {
+        if (typeof middleware !== 'function'){
+          throw new Error(getErrorMessage('KRO0004'))
+        }
+
+        return {
+          path: args[0],
+          handler: middleware
+        }
+      }))
 
       return
     }

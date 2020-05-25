@@ -353,11 +353,29 @@ test('should throw an error when a invalid middleware is detected', t => {
 
   t.is(error.message, 'Incorrect param type, the expect type is function or array of functions')
 
-  // error = t.throws(() => {
-  //   router.use(null, null)
-  // }, { instanceOf: Error })
+  error = t.throws(() => {
+    router.use(null, null)
+  }, { instanceOf: Error })
 
-  // t.is(error.message, 'Incorrect params type, the expect type are string and function or string and array of functions')
+  t.is(error.message, 'Incorrect params type, the expect type are string and function or string and array of functions')
+
+  error = t.throws(() => {
+    router.use('', null)
+  }, { instanceOf: Error })
+
+  t.is(error.message, 'Incorrect params type, the expect type are string and function or string and array of functions')
+
+  error = t.throws(() => {
+    router.use('/users', null)
+  }, { instanceOf: Error })
+
+  t.is(error.message, 'Incorrect params type, the expect type are string and function or string and array of functions')
+
+  error = t.throws(() => {
+    router.use('/users', [null])
+  }, { instanceOf: Error })
+
+  t.is(error.message, 'Incorrect params type, the expect type is function')
 
   error = t.throws(() => {
     router.use()
