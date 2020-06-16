@@ -58,14 +58,14 @@ test.serial('should add multiple routes', t => {
       query: {}
     }, {
       handler,
-      params: { 'id': undefined },
+      params: { id: undefined },
       path: /^\/route\/([A-Za-z0-9_-]+)$/,
       method: 'GET',
       query: {}
     }],
     DELETE: [{
       handler,
-      params: { 'id': undefined },
+      params: { id: undefined },
       path: /^\/route\/([A-Za-z0-9_-]+)$/,
       method: 'DELETE',
       query: {}
@@ -438,7 +438,7 @@ test.serial.cb('should parse cookie', t => {
   const request = new IncomingMessage(new Socket())
   request.url = url
   request.method = 'POST'
-  request.headers['cookie'] = cookie
+  request.headers.cookie = cookie
 
   const handler = (request) => {
     t.deepEqual(request.cookie, parsedCookie)

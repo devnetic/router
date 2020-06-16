@@ -9,14 +9,22 @@
     "build:watch": "npm run build -- -w",
     "clean": "rm -rf lib",
     "coverage": "nyc ava",
-    "lint": "eslint src/* --ext .ts",
-    "prepublishOnly": "npm run build && npm run lint",
+    "lint": "ts-standard",
+    "lint:fix": "ts-standard --fix",
+    "prepublishOnly": "npm run build && npm run lint && npm run test",
     "test": "ava",
-    "test:watch": "ava --watch"
+    "test:watch": "ava --watch",
+    "compile": "tsc"
   },
   "ava": {
     "files": [
       "test/**/*.spec.js"
+    ]
+  },
+  "ts-standard": {
+    "ignore": [
+      "lib",
+      "examples"
     ]
   },
   "repository": {
@@ -31,7 +39,8 @@
     "server"
   ],
   "files": [
-    "lib/**/*"
+    "lib/**/*",
+    ".error-description"
   ],
   "author": "Álvaro José Agámez Licha",
   "license": "MIT",
@@ -42,18 +51,11 @@
   "devDependencies": {
     "@types/node": "^14.0.1",
     "@types/sinon": "^9.0.0",
-    "@typescript-eslint/eslint-plugin": "^2.33.0",
     "ava": "^3.8.2",
-    "eslint": "^7.0.0",
-    "eslint-config-standard-with-typescript": "^16.0.0",
-    "eslint-plugin-import": "^2.20.2",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1",
     "nyc": "^15.0.1",
     "sinon": "^9.0.2",
-    "standard": "^14.3.4",
     "ts-node": "^8.10.1",
+    "ts-standard": "^8.0.1",
     "typescript": "^3.9.2"
   },
   "dependencies": {

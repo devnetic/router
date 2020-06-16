@@ -1,5 +1,6 @@
 import { IncomingMessage, ServerResponse } from 'http'
 import { URL } from 'url'
+import path from 'path'
 
 import * as loadEnv from '@devnetic/load-env'
 import * as utils from '@devnetic/utils'
@@ -8,7 +9,8 @@ import { /* createResponse, */ Response } from './'
 import { formData, getBoundary, urlEncoded } from './parser'
 import { parse as parseCookie, Cookie } from './cookie'
 
-loadEnv.load('./src/.errors-description')
+loadEnv.load(path.join(process.cwd(), '.error-description'))
+console.log(path.join(process.cwd(), '.error-description'))
 
 export interface Router {
   attach(request: Request, response: ServerResponse): void
@@ -116,7 +118,7 @@ const attach = (request: Request, response: ServerResponse): void => {
   const routes = router.getRoutes(request.url, request.method)
 
   if (routes.length === 0) {
-    console.log(getErrorMessage('KRO0005', { url: request.url }))
+    console.error(getErrorMessage('KRO0005', { url: request.url }))
 
     response.statusCode = 404
     response.end()
@@ -356,7 +358,7 @@ const use = (...args: any[]): void => {
       return
     } else {
       middlewares.push(...args[1].map((middleware: Function) => {
-        if (typeof middleware !== 'function'){
+        if (typeof middleware !== 'function') {
           throw new Error(getErrorMessage('KRO0004'))
         }
 

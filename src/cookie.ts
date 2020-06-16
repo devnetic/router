@@ -46,7 +46,7 @@ export const parse = (cookie: string): Cookie => {
   return cookie.split(';').reduce((result: any, current: string) => {
     const [key, value] = current.split('=')
 
-    result[utils.camelCase(key)] = value ? decode(value) : true
+    result[utils.camelCase(key)] = value !== undefined ? decode(value) : true
 
     return result
   }, {}) as Cookie
@@ -64,7 +64,7 @@ const validate = (name: string, value: string, options: CookieOptions): void => 
     throw new TypeError('Argument name is invalid')
   }
 
-  if (value && !fieldContentRegExp.test(value)) {
+  if (Boolean(value) && !fieldContentRegExp.test(value)) {
     throw new TypeError('Argument value is invalid')
   }
 
