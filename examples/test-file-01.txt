@@ -1,0 +1,15 @@
+----------------------------763674504710465161187611
+Content-Disposition: form-data; name="id"
+
+123
+----------------------------763674504710465161187611
+Content-Disposition: form-data; name="name"
+
+Mike Doe
+----------------------------763674504710465161187611
+Content-Disposition: form-data; name="file"; filename="test-file.txt"
+Content-Type: text/plain
+
+some file content
+
+----------------------------763674504710465161187611--
