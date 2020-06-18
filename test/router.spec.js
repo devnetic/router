@@ -301,6 +301,55 @@ test.serial.cb('should parse form-data body with files', t => {
   router.attach(request, response)
 })
 
+test.serial.cb('should parse query params', t => {
+  const method = 'GET'
+  const query = 'sort=name&limit=10&offset=2'
+  const url = '/users'
+  const handler = (request) => {
+    t.deepEqual(request.query, queryParams)
+
+    t.end()
+  }
+
+  const queryParams = { sort: 'name', limit: '10', offset: '2' }
+
+  const request = new IncomingMessage(new Socket())
+  request.url = `${url}?${query}`
+  request.method = method
+
+  const response = {
+    end: () => { }
+  }
+
+  router.get(url, handler)
+
+  router.attach(request, response)
+})
+
+test.serial.cb('should parse route params', t => {
+  const method = 'GET'
+  const url = '/users/10/settings/2'
+  const handler = (request) => {
+    t.deepEqual(request.params, routeParams)
+
+    t.end()
+  }
+
+  const routeParams = { id: '10', settingId: '2' }
+
+  const request = new IncomingMessage(new Socket())
+  request.url = url
+  request.method = method
+
+  const response = {
+    end: () => { }
+  }
+
+  router.get('/users/:id/settings/:settingId', handler)
+
+  router.attach(request, response)
+})
+
 test.serial('should return 404 status code when there are not routes defined', t => {
   const url = '/users'
 

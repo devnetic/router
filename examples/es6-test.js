@@ -12,12 +12,12 @@ const requestHandler = (request, response) => {
     body: request.body
   }
 
-  response.writeHead(200, {
+  response.header({
     'Content-Type': 'application/json',
     'X-Powered-By': 'kiirus-router'
   })
 
-  response.end(JSON.stringify(data))
+  response.json(data).end()
 }
 
 const handlers = [(request, response) => {
@@ -27,7 +27,7 @@ const handlers = [(request, response) => {
 }]
 
 router.use((request, response) => {
-  request.params = { foo: 'value'}
+  request.params = { ...request.params, ...{ foo: 'value' } }
   console.log('Application-level middleware')
 })
 

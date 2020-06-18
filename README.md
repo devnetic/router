@@ -1,5 +1,6 @@
 # @devnetic/router
 
+![Node CI](https://github.com/devnetic/router/workflows/Node%20CI/badge.svg)
 ![npm (scoped)](https://img.shields.io/npm/v/@devnetic/router)
 ![npm bundle size (scoped)](https://img.shields.io/bundlephobia/minzip/@devnetic/router?color=red)
 ![npm](https://img.shields.io/npm/dt/@devnetic/router)
@@ -16,15 +17,7 @@ Simple router to match URLs.
 ## Using the router module in a HTTP server
 ```javascript
 const http = require('http')
-const router = require('@devnetic/router')
-
-const server = http.createServer(requestHandler)
-
-router.delete('/users', handler)
-router.get('/users', handler)
-router.patch('/users', handler)
-router.post('/users', handler)
-router.put('/users', handler)
+const { router }  = require('@devnetic/router')
 
 /**
  *
@@ -32,53 +25,73 @@ router.put('/users', handler)
  * @param {ServerResponse} response
  */
 const requestHandler = (request, response) => {
-  const routes = router.checkRoute(request.url, request.method)
+  // Set a cookie in the response
+  response.cookie('key', 'some-value')
 
-  if (routes.length === 0) {
-    console.log('Error 404: No route handler defined for the given route.')
-
-    return
+  const data = {
+    status: 'ok',
+    body: request.body
   }
 
-  for (const route of routes) {
-    ...your code here
-  }
+  response.header({
+    'Content-Type': 'application/json',
+    'X-Powered-By': 'kiirus-router'
+  })
+
+  // send JSON data easily
+  response.json(data).end()
 }
+
+router.delete('/users', requestHandler)
+router.get('/users', requestHandler)
+router.patch('/users', requestHandler)
+router.post('/users', requestHandler)
+router.put('/users', requestHandler)
+
+// attach method is the router handler to intercept every request to the server
+// and validate if the request url is a valid defined route
+const server = http.createServer(router.attach)
+
+server.listen(3000, () => {
+  console.log('listening in the port 3000')
+})
 ```
 
-## Basic usage of router module
+## Middleware
+
+Middleware functions are functions that have access to the request object (req), the response object (res), in the application’s request-response cycle.
+
+Middleware functions can perform the following tasks:
+
+- Execute any code.
+- Make changes to the request and the response objects.
+- End the request-response cycle.
+
 ```javascript
-const router = require('@devnetic/router')
-
-const handler = (request, response) => {
-  console.log(request, response)
-}
-
-router.delete('/users', handler)
-router.get('/users', handler)
-router.patch('/users', handler)
-router.post('/users', handler)
-router.put('/users', handler)
-
-// router support chainning
-router.get('/users/:id', handler)
-  .get('/users/favorites/:id', handler)
-
-// checkRoute method return a array with all routes that match the pattern
-router.checkRoute('/users?limit=10&offset=2', 'GET').forEach(route => {
-  const request = {
-    params: route.params,
-    query: route.query
-  }
-
-  route.handler(request, {})
+// Application level middleware
+router.use((request, response) => {
+  request.params = { ...request.params, ...{ foo: 'value' } }
+  console.log('Application-level middleware')
 })
 
-// You can set the routes object to a object following the necessary structure
-router.setRoutes({})
+// Route level middleware
+router.use('/users', (request, response) => {
+  console.log('Route-level middleware')
+})
+```
 
-// And get the registered routes
-console.log('Routes: %o', router.getRoutes())
+## **request.body**
+Contains key-value pairs of data submitted in the request body. By default, it
+is undefined.
+
+```javascript
+const { router }  = require('@devnetic/router')
+
+router.post('/users', (req, res) => {
+  console.log(req.body)
+
+  res.json(req.body)
+})
 ```
 
 ## Route Groups
@@ -99,7 +112,7 @@ router.checkRoute('/v1/login', 'POST') // return the login route object
 ```
 
 ## Route Methods
-- [DELETE](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/DELETE); The `DELETE` method deletes the specified resource.
+- [DELETE](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/DELETE): The `DELETE` method deletes the specified resource.
 - [GET](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET): The `GET` method requests a representation of the specified resource. Requests using GET should only retrieve data.
 - [HEAD](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD): The `HEAD` method asks for a response identical to that of a GET request, but without the response body.
 - [OPTIONS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/OPTIONS): The `OPTIONS` method is used to describe the communication options for the target resource.
@@ -108,6 +121,17 @@ router.checkRoute('/v1/login', 'POST') // return the login route object
 - [PUT](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PUT): The `PUT` method replaces all current representations of the target resource with the request payload.
 
 # Changelog
+
+### Version 2.0.0
+- Auto verify routes.
+- Add middleware feature.
+- Remove verifyRoute() method.
+- Remove checkRoute() method.
+- Add body parsing.
+- Add form data parsing.
+- Add url encoded parsing.
+- Add cookie feature.
+- Improve code coverage.
 
 ### Version 1.1.0
 - Deprecate verifyRoute() method.
@@ -121,7 +145,7 @@ router.checkRoute('/v1/login', 'POST') // return the login route object
 # TODO
 - [X] Add more examples and usage description to README.
 - [X] Add group routes.
-- [ ] Add more functionalities.
+- [X] Add more functionalities.
 - [X] Write missing test cases.
 - [X] Add code coverage.
-- [ ] Use Babel for the source code.
+- [X] Migrate to TypeScript

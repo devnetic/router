@@ -6,13 +6,8 @@ const sinon = require('sinon')
 
 const { Response } = require('./../lib/')
 
-let response
-
-test.beforeEach(t => {
-  response = new Response(new IncomingMessage(new Socket()))
-})
-
 test('should destroy the cookie after call clearCookie', t => {
+  const response = new Response(new IncomingMessage(new Socket()))
   const cookie = 'name=;Expires=Thu, 01 Jan 1970 00:00:00 GMT;Path=/'
 
   response.clearCookie('name')
@@ -21,6 +16,7 @@ test('should destroy the cookie after call clearCookie', t => {
 })
 
 test('should create a cookie', t => {
+  const response = new Response(new IncomingMessage(new Socket()))
   const name = 'foo'
   const value = 'bar'
   const expires = new Date('2020/04/22').toUTCString()
@@ -51,6 +47,7 @@ test('should create a cookie', t => {
 })
 
 test('should send a json response with 200 status code', t => {
+  const response = new Response(new IncomingMessage(new Socket()))
   const data = {
     foo: 'bar'
   }
@@ -75,6 +72,7 @@ test('should send a json response with 200 status code', t => {
 })
 
 test('should send a json response with 500 status code', t => {
+  const response = new Response(new IncomingMessage(new Socket()))
   const data = {
     message: 'unexpected error'
   }
@@ -99,6 +97,7 @@ test('should send a json response with 500 status code', t => {
 })
 
 test('should send a response', t => {
+  const response = new Response(new IncomingMessage(new Socket()))
   const data = 'some plain content'
   const encoding = 'utf-8'
   const headers = {
@@ -121,6 +120,7 @@ test('should send a response', t => {
 })
 
 test('should send a response with custom options', t => {
+  const response = new Response(new IncomingMessage(new Socket()))
   const data = {
     message: 'unexpected error'
   }
@@ -149,7 +149,19 @@ test('should send a response with custom options', t => {
 })
 
 test('should set the response status', t => {
+  const response = new Response(new IncomingMessage(new Socket()))
   response.status(404)
 
   t.is(response.statusCode, 404)
+})
+
+test('should set multiple header', t => {
+  const response = new Response(new IncomingMessage(new Socket()))
+  const headers = {
+    'content-type': 'application/json',
+    'x-powered-by': 'kiirus-router'
+  }
+  response.header(headers)
+
+  t.deepEqual(response.getHeaders(), headers)
 })

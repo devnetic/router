@@ -9,8 +9,7 @@ import { /* createResponse, */ Response } from './'
 import { formData, getBoundary, urlEncoded } from './parser'
 import { parse as parseCookie, Cookie } from './cookie'
 
-loadEnv.load(path.join(process.cwd(), '.error-description'))
-console.log(path.join(process.cwd(), '.error-description'))
+loadEnv.load(path.join(__dirname, '../.error-description'))
 
 export interface Router {
   attach(request: Request, response: ServerResponse): void
@@ -38,9 +37,7 @@ export interface Request extends IncomingMessage {
   query?: Object
 }
 
-// export type RouteHandler = (request: IncomingMessage, response: ServerResponse) => void
 export type RouteHandler = (request: Request, response: Response) => void
-// export type RouteHandler = (request: Request, response: ServerResponse) => void
 
 export interface Route {
   handler: RouteHandler
@@ -131,6 +128,9 @@ const attach = (request: Request, response: ServerResponse): void => {
   })
 
   for (const route of routes) {
+    request.params = route.params
+    request.query = route.query
+
     requestMiddlewares.map((middleware: Middleware) => {
       middleware.handler(request, response)
     })
@@ -289,7 +289,7 @@ const setParamsKey = (path: string): RouteParams => {
  */
 const setParamsValue = (params: RouteParams, match: string[]): RouteParams => {
   return Object.keys(params).reduce((params: RouteParams, key: string, index: number) => {
-    return { [key]: match[index] }
+    return { [key]: match[index], ...params }
   }, {})
 }
 

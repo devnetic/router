@@ -59,13 +59,20 @@ export class Response extends ServerResponse {
    * Sets the header field to value. To set multiple fields at once, pass an
    * object as the parameter.
    *
-   * @param {string} field
+   * @param {string|Object} field
    * @param {string} value
    * @returns {Response}
    * @memberof Response
    */
-  header (field: string, value: string): Response {
-    this.setHeader(field, value)
+  header (field: string, value: string): Response
+  header (field: Object, value: string): Response {
+    if (typeof field === 'object') {
+      for (const [headerField, headerValue] of Object.entries(field)) {
+        this.setHeader(headerField, headerValue)
+      }
+    } else {
+      this.setHeader(field, value)
+    }
 
     return this
   }
