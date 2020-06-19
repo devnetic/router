@@ -3,11 +3,12 @@ const test = require('ava')
 const { create, parse } = require('./../lib/cookie')
 
 test('should parse a cookie', t => {
-  const cookie = 'foo=bar;Domain=https://localhost:3000;Expires=Wed, 22 Apr 2020 05:00:00 GMT;HttpOnly;Max-Age=12;Path=/;SameSite=Lax;Secure'
+  const expires = new Date('2020/04/22').toUTCString()
+  const cookie = `foo=bar;Domain=https://localhost:3000;Expires=${expires};HttpOnly;Max-Age=12;Path=/;SameSite=Lax;Secure`
   const expected = {
     foo: 'bar',
     domain: 'https://localhost:3000',
-    expires: 'Wed, 22 Apr 2020 05:00:00 GMT',
+    expires,
     httpOnly: true,
     maxAge: '12',
     sameSite: 'Lax',
@@ -45,7 +46,7 @@ test('should create a cookie with options', t => {
     sameSite,
     secure
   }
-  const expected = `${name}=${value};Domain=${domain};Expires=Wed, 22 Apr 2020 05:00:00 GMT;HttpOnly;Max-Age=${maxAge};Path=${path};SameSite=${sameSite};Secure`
+  const expected = `${name}=${value};Domain=${domain};Expires=${expires};HttpOnly;Max-Age=${maxAge};Path=${path};SameSite=${sameSite};Secure`
 
   t.deepEqual(create(name, value, options), expected)
 })
