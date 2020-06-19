@@ -35,11 +35,13 @@ test('should create a cookie', t => {
     sameSite,
     secure
   }
-  let expected = `${name}=${value};Domain=${domain};Expires=Wed, 22 Apr 2020 05:00:00 GMT;HttpOnly;Max-Age=${maxAge};Path=${path};SameSite=${sameSite};Secure`
+  let expected = `${name}=${value};Domain=${domain};Expires=${expires};HttpOnly;Max-Age=${maxAge};Path=${path};SameSite=${sameSite};Secure`
 
   response.cookie(name, value, options)
 
-  expected = `${name}=${encodeURIComponent(JSON.stringify({ foo: 'bar' }))};Domain=${domain};Expires=Wed, 22 Apr 2020 05:00:00 GMT;HttpOnly;Max-Age=${maxAge};Path=${path};SameSite=${sameSite};Secure`
+  t.is(response.getHeader('Set-Cookie'), expected)
+
+  expected = `${name}=${encodeURIComponent(JSON.stringify({ foo: 'bar' }))};Domain=${domain};Expires=${expires};HttpOnly;Max-Age=${maxAge};Path=${path};SameSite=${sameSite};Secure`
 
   response.cookie(name, { foo: 'bar' }, options)
 
