@@ -16,13 +16,13 @@ export interface Router {
   delete(path: string, handler: RouteHandler): Router
   get(path: string, handler: RouteHandler): Router
   getRegisteredRoutes(): Routes
-  getRegisteredMiddlewares(): Middleware[]
+  getRegisteredMiddleware(): Middleware[]
   getRoutes(path: string | undefined, method: string | undefined): Route[]
   group(name: string, routes: GroupRoute[]): Routes
   patch(path: string, handler: RouteHandler): Router
   post(path: string, handler: RouteHandler): Router
   put(path: string, handler: RouteHandler): Router
-  setMiddlewares(newMiddlewares: Middleware[]): Router
+  setMiddleware(newMiddleware: Middleware[]): Router
   setRoutes(newRoutes: Routes): Router
   use(handler: Function | Function[]): void
   use(path: string, handler: Function | Function[]): void
@@ -31,10 +31,11 @@ export interface Router {
 export type RequestBody = Record<string, string | number | boolean | Object | null | undefined>
 
 export interface Request extends IncomingMessage {
-  cookie?: Cookie
+  cookies?: Cookie
   body?: RequestBody
   params?: Object
   query?: Object
+  route: Route
 }
 
 export type RouteHandler = (request: Request, response: Response) => void
@@ -76,7 +77,7 @@ const methods = [
   'put'
 ]
 
-let middlewares: Middleware[] = []
+let middleware: Middleware[] = []
 
 let routes: Routes = {}
 
@@ -123,20 +124,23 @@ const attach = (request: Request, response: ServerResponse): void => {
     return
   }
 
-  const requestMiddlewares = middlewares.filter((middleware: Middleware) => {
+  const requestMiddleware = middleware.filter((middleware: Middleware) => {
     return middleware.path === request.url || middleware.path === undefined
   })
 
   for (const route of routes) {
     request.params = route.params
     request.query = route.query
+    request.route = route
 
-    requestMiddlewares.map((middleware: Middleware) => {
+    requestMiddleware.map((middleware: Middleware) => {
       middleware.handler(request, response)
     })
 
     if (request.headers.cookie !== undefined) {
-      request.cookie = parseCookie(request.headers.cookie)
+      request.cookies = parseCookie(request.headers.cookie)
+    } else {
+      request.cookies = {}
     }
 
     getBody(request, (body: RequestBody) => {
@@ -205,12 +209,12 @@ const getErrorMessage = (code: string, messages: ErrorMessage = {}): string => {
 }
 
 /**
- * Return the registered middlewares
+ * Return the registered middleware
  *
  * @returns {Middleware[]}
  */
-const getRegisteredMiddlewares = (): Middleware[] => {
-  return middlewares
+const getRegisteredMiddleware = (): Middleware[] => {
+  return middleware
 }
 
 /**
@@ -294,13 +298,13 @@ const setParamsValue = (params: RouteParams, match: string[]): RouteParams => {
 }
 
 /**
- * Set the middlewares to a complete new ones
+ * Set the middleware to a complete new ones
  *
  * @param {Route[]} newRoutes
  * @returns {void}
  */
-const setMiddlewares = (newMiddlewares: Middleware[]): Router => {
-  middlewares = newMiddlewares
+const setMiddleware = (newMiddleware: Middleware[]): Router => {
+  middleware = newMiddleware
 
   return router
 }
@@ -324,14 +328,14 @@ const use = (...args: any[]): void => {
     }
 
     if (typeof args[0] === 'function') {
-      middlewares.push({
+      middleware.push({
         path: undefined,
         handler: args[0]
       })
 
       return
     } else {
-      middlewares.push(...args[0].map((middleware: Function) => ({
+      middleware.push(...args[0].map((middleware: Function) => ({
         path: undefined,
         handler: middleware
       })))
@@ -350,14 +354,14 @@ const use = (...args: any[]): void => {
     }
 
     if (typeof args[1] === 'function') {
-      middlewares.push({
+      middleware.push({
         path: args[0],
         handler: args[1]
       })
 
       return
     } else {
-      middlewares.push(...args[1].map((middleware: Function) => {
+      middleware.push(...args[1].map((middleware: Function) => {
         if (typeof middleware !== 'function') {
           throw new Error(getErrorMessage('KRO0004'))
         }
@@ -378,11 +382,11 @@ const use = (...args: any[]): void => {
 const proxyTarget = {
   addRoute,
   attach,
-  getRegisteredMiddlewares,
+  getRegisteredMiddleware,
   getRegisteredRoutes,
   getRoutes,
   group,
-  setMiddlewares,
+  setMiddleware,
   setRoutes,
   use
 }

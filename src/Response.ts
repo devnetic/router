@@ -15,7 +15,7 @@ export class Response extends ServerResponse {
    * @param {IncomingMessage} request
    * @memberof Response
    */
-  constructor (request: IncomingMessage) {
+  constructor (private readonly request: IncomingMessage) {
     super(request)
 
     Reflect.set(request.socket, '_httpMessage', null)
@@ -64,14 +64,13 @@ export class Response extends ServerResponse {
    * @returns {Response}
    * @memberof Response
    */
-  header (field: string, value: string): Response
-  header (field: Object, value: string): Response {
+  header (field: string | Object, value: string): Response {
     if (typeof field === 'object') {
       for (const [headerField, headerValue] of Object.entries(field)) {
-        this.setHeader(headerField, headerValue)
+        this.setHeader(headerField.toLowerCase(), headerValue)
       }
     } else {
-      this.setHeader(field, value)
+      this.setHeader(field.toLowerCase(), value)
     }
 
     return this
@@ -89,7 +88,14 @@ export class Response extends ServerResponse {
    * @memberof Response
    */
   json (data: Object, statusCode: number = 200, encoding: BufferEncoding = 'utf-8'): Response {
-    this.send(JSON.stringify(data), { statusCode, contentType: 'application/json', encoding })
+    const json = JSON.stringify(data)
+
+    this.writeHead(statusCode, {
+      'Content-Length': Buffer.byteLength(json),
+      'Content-Type': 'application/json'
+    })
+
+    this.write(json, encoding)
 
     return this
   }
@@ -103,12 +109,42 @@ export class Response extends ServerResponse {
    * @memberof Response
    */
   send (data: any, { statusCode = 200, contentType = 'text/plain', encoding = 'utf-8' }: SendOptions = {}): Response {
+    switch (typeof data) {
+      case 'boolean':
+      case 'number':
+      case 'object':
+        if (data === null) {
+          data = ''
+        } else if (Buffer.isBuffer(data)) {
+          if (this.getHeader('Content-Type') === undefined) {
+            contentType = 'application/octet-stream'
+            encoding = 'binary'
+          }
+        } else {
+          return this.json(data)
+        }
+
+        break
+    }
+
+    // remove unnecessary headers
+    if (this.statusCode === 204 || this.statusCode === 304) {
+      data = ''
+
+      this.removeHeader('Content-Length')
+      this.removeHeader('Content-Type')
+      this.removeHeader('Transfer-Encoding')
+    }
+
     this.writeHead(statusCode, {
       'Content-Length': Buffer.byteLength(data),
       'Content-Type': contentType
     })
 
-    this.write(data, encoding)
+    if (this.request.method !== 'HEAD') {
+      this.write(data, encoding)
+    }
+
     this.end()
 
     return this

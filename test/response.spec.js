@@ -58,17 +58,14 @@ test('should send a json response with 200 status code', t => {
   }
   const writeHeadStub = sinon.stub(response, 'writeHead')
   const writeStub = sinon.stub(response, 'write')
-  const endStub = sinon.stub(response, 'end')
 
   response.json(data)
 
   t.true(writeHeadStub.calledOnceWith(200, headers))
   t.true(writeStub.calledOnceWith(JSON.stringify(data), encoding))
-  t.true(endStub.calledOnce)
 
   writeHeadStub.restore()
   writeStub.restore()
-  endStub.restore()
 })
 
 test('should send a json response with 500 status code', t => {
@@ -83,17 +80,14 @@ test('should send a json response with 500 status code', t => {
   }
   const writeHeadStub = sinon.stub(response, 'writeHead')
   const writeStub = sinon.stub(response, 'write')
-  const endStub = sinon.stub(response, 'end')
 
   response.json(data, 500)
 
   t.true(writeHeadStub.calledOnceWith(500, headers))
   t.true(writeStub.calledOnceWith(JSON.stringify(data), encoding))
-  t.true(endStub.calledOnce)
 
   writeHeadStub.restore()
   writeStub.restore()
-  endStub.restore()
 })
 
 test('should send a response', t => {
@@ -103,6 +97,29 @@ test('should send a response', t => {
   const headers = {
     'Content-Length': Buffer.byteLength(data),
     'Content-Type': 'text/plain'
+  }
+  const writeHeadStub = sinon.stub(response, 'writeHead')
+  const writeStub = sinon.stub(response, 'write')
+  const endStub = sinon.stub(response, 'end')
+
+  response.send(data)
+
+  t.true(writeHeadStub.calledOnceWith(200, headers))
+  t.true(writeStub.calledOnceWith(data, encoding))
+  t.true(endStub.calledOnce)
+
+  writeHeadStub.restore()
+  writeStub.restore()
+  endStub.restore()
+})
+
+test('should send a response with buffer data', t => {
+  const response = new Response(new IncomingMessage(new Socket()))
+  const data = Buffer.from('some plain content')
+  const encoding = 'binary'
+  const headers = {
+    'Content-Length': Buffer.byteLength(data),
+    'Content-Type': 'application/octet-stream'
   }
   const writeHeadStub = sinon.stub(response, 'writeHead')
   const writeStub = sinon.stub(response, 'write')
